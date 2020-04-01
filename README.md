@@ -23,13 +23,24 @@ TBC
 
 
 
-# Tech Stack
-- Java 11
-- Spring Sleuth
-- Documentation generated using RestDocs
-- Docker
-- K8s
-- TBC...
+# Technology Stack
+
+Area | Library | Link
+--- | --- | ---
+Programming Language | Java 11 | tbc
+Cache Layer | tbc | tbc
+DB layer | Spring Data <br> mybatis | https://mybatis.org/mybatis-3/
+Documentation | REST docs | 
+Dev Tools | lombok |
+Ops | Spring Actuator | https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html
+Distributed Tracing | Sleuth <br> Zipkin |
+Cloud Messaging | Solace PubSub+ <br> Spring Clound Messaging |
+Databases | H2 <br> mySQL |
+Database Schema Management | liquibase |
+Testing | JUnit <br> AssertJ <br> Mockito <br> REST Assured |
+Deployment | Docker <br> Kubernetes |
+Build | Maven |
+
 
 # TODO:
 - [ ] Setup a CI/CD solution with CircleCI
