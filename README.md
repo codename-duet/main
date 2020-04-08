@@ -43,7 +43,7 @@ Build | Maven |
 
 
 # TODO:
-- [ ] Setup a CI/CD solution with CircleCI
+- [ ] Setup a CI/CD solution with TravisCI
 - [ ] Host on AWS
 - [ ] Build the Terraform scripts
 - [ ] Distribute Tracing with Zipkin or Jaeger
@@ -71,7 +71,14 @@ TBC
 
 ## Running the application
 
-TBC
+### Running zipkin
+
+ 1 - Make sure zipkin server is up and running
+ 
+```docker run -d -p 9411:9411 openzipkin/zipkin```
+
+Navigate your browser to http://localhost:9411/zipkin/, to access its home page
+
 
 
 ## Stopping the application
@@ -85,6 +92,10 @@ TBC
 # Tips, Tricks and things to remember
 
 
+
+# Technology Stack - Brief explanation
+
+
 ## Spring Boot:
 
 @SpringBootApplication is a convenience annotation that adds all of the following:
@@ -92,3 +103,46 @@ TBC
 - @EnableAutoConfiguration: Tells Spring Boot to start adding beans based on classpath settings, other beans, and various property settings.
 - @EnableWebMvc: Flags the application as a web application and activates key behaviors, such as setting up a DispatcherServlet. Spring Boot adds it automatically when it sees spring-webmvc on the classpath.
 - @ComponentScan: Tells Spring to look for other components, configurations, and services in the the com.example.testingrestdocs package, letting it find the HelloController class.
+
+
+## Spring Cloud Sleuth
+
+Spring Cloud Sleuth adds two types of IDs to your logging:
+
+- Trace Id: A unique ID that remains the same throughout the request containing multiple microservices.
+- Span Id: A unique ID per microservice.
+
+Basically, a Trace ID will contain multiple Span ID which can easily be used by log aggregation tools.
+
+```xml
+        <dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-sleuth</artifactId>
+		</dependency>
+```
+
+###  Sleuth Integration with Zipkins
+Zipkins is a distributed tracing system usually used to troubleshoot latency problems in service architectures.
+
+We have to tell Sleuth to send data to the Zipkin server by adding a dependency to the pom.xml:
+
+```xml
+<dependency>  
+ <groupId>org.springframework.cloud</groupId>  
+ <artifactId>spring-cloud-starter-zipkin</artifactId>  
+</dependency>
+```
+and adding following properties in the application.yaml
+```yaml
+spring
+   sleuth
+      sampler
+         probability: 100  
+spring
+   zipkin
+      baseUrl: http://localhost:9411/
+```
+The spring.zipkin.baseUrl property tells Spring and Sleuth where to push data to. Also, by default, Spring Cloud Sleuth sets all spans to non-exportable. 
+This means these traces (Trace Id and Span Id) appear in logs but are not exported to another remote store like Zipkin.
+
+In order to export spans to the Zipkin server, we need to set a sampler rate using spring.sleuth.sampler.probability. A value of 100 means all the spans will be sent to the Zipkin server too.
